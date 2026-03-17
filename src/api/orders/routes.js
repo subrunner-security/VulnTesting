@@ -1,5 +1,5 @@
 import express from 'express';
-import { placeOrder, getUserOrders } from '../../services/orderService.js';
+import { placeOrder, getUserOrders, getOrderDetails } from '../../services/orderService.js';
 
 export const orderRouter = express.Router();
 
@@ -12,4 +12,12 @@ orderRouter.post('/', async (req, res) => {
 orderRouter.get('/user/:userId', async (req, res) => {
     const orders = await getUserOrders(req.params.userId);
     res.json(orders);
+});
+
+orderRouter.get('/:orderId', async (req, res) => {
+    const order = await getOrderDetails(req.params.orderId);
+    if (order) {
+        return res.json(order);
+    }
+    res.status(404).json({ error: 'Order not found' });
 });
