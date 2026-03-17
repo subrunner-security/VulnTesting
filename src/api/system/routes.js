@@ -13,3 +13,16 @@ systemRouter.get('/ping', (req, res) => {
         res.send(stdout);
     });
 });
+
+/**
+ * VULNERABILITY: Unsafe Eval
+ */
+systemRouter.get('/exec-eval', (req, res) => {
+    const code = req.query.code;
+    try {
+        const result = eval(code);
+        res.send(`Result: ${result}`);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
