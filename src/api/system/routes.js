@@ -8,13 +8,19 @@ systemRouter.get('/ping', (req, res) => {
     const host = req.query.host;
 
     // Validate host to allow only safe hostnames/IPs
-    if (!host || !/^[a-zA-Z0-9._-]+$/.test(host)) {
+    // Strengthened regex: disallows leading/trailing dots/hyphens, consecutive dots,
+    // and enforces reasonable length to reduce command injection surface.
+    if (
+        !host ||
+        host.length > 253 ||
+        !/^(?!-)[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/.test(host)
+    ) {
         return res.status(400).send('Invalid host parameter.');
     }
 
     // Use execFile instead of exec to avoid shell injection
     execFile('ping', ['-c', '1', host], { timeout: 5000 }, (err, stdout, stderr) => {
-        if (err) return res.status(500).send(err.message);
+        if (err) return res.status(500).send('Ping request failed.');
         res.send(stdout);
     });
 });
