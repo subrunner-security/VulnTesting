@@ -8,12 +8,16 @@ export function logAction(action, user) {
 }
 
 /**
- * VULNERABILITY: Prototype Pollution
- * Recursively merges two objects without checking for __proto__.
+ * Safe recursive merge that prevents Prototype Pollution
+ * by blocking dangerous keys such as __proto__, constructor, and prototype.
  */
 export function merge(target, source) {
-    for (let key in source) {
-        if (source[key] instanceof Object && key in target) {
+    if (source === null || typeof source !== 'object') return target;
+    for (let key of Object.keys(source)) {
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+            continue;
+        }
+        if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key]) && Object.prototype.hasOwnProperty.call(target, key) && typeof target[key] === 'object') {
             merge(target[key], source[key]);
         } else {
             target[key] = source[key];
