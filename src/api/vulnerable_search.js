@@ -1,21 +1,22 @@
 import express from 'express';
-import { runRaw } from '../db/queryBuilder.js';
+import { searchUsers } from '../services/searchService.js';
+import { searchRequestLogger } from '../middleware/logger.js';
 
 const vulnerableSearchRouter = express.Router();
 
 /**
- * VULNERABILITY: SQL Injection
- * This endpoint takes user input directly and executes it as a raw SQL query.
- * Example of exploitation: /search?query=admin' OR '1'='1
+ * Advanced Search Endpoint
+ * Now uses a service layer and sanitization.
+ * NOTE: The 'limit' parameter is passed directly from user input.
  */
-vulnerableSearchRouter.get('/search', async (req, res) => {
-    const query = req.query.query;
+vulnerableSearchRouter.get('/search', searchRequestLogger, async (req, res) => {
+    const { username, email, limit } = req.query;
+    
     try {
-        const sql = `SELECT * FROM users WHERE username = '${query}'`;
-        const results = await runRaw(sql);
-        res.json({ success: true, data: results });
+        const results = await searchUsers({ username, email, limit });
+        res.json({ success: true, count: results.length, data: results });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: "An unexpected error occurred." });
     }
 });
 
