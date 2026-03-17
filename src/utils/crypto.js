@@ -2,15 +2,18 @@ import crypto from 'crypto';
 
 export function weakHash(data) {
     /**
-     * VULNERABILITY: Use of MD5 (weak cryptographic hash)
+     * FIX: Use SHA-256 instead of MD5 (strong cryptographic hash)
      */
-    return crypto.createHash('md5').update(data).digest('hex');
+    return crypto.createHash('sha256').update(data).digest('hex');
 }
 
 export function symmetricEncrypt(data, key) {
     /**
-     * VULNERABILITY: Use of DES (obsolete encryption)
+     * FIX: Use AES-256-GCM instead of DES (modern, authenticated encryption)
      */
-    const cipher = crypto.createCipheriv('des-ede3', key, Buffer.alloc(8));
-    return cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    const encrypted = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+    const authTag = cipher.getAuthTag().toString('hex');
+    return iv.toString('hex') + ':' + authTag + ':' + encrypted;
 }
