@@ -12,3 +12,14 @@ export async function login(username, password) {
     }
     return null;
 }
+
+/**
+ * VULNERABILITY: IDOR / Improper Authentication
+ * No session check or verification of the user being updated.
+ */
+export async function updateUserPassword(userId, newPassword) {
+    // Directly updating password for any user ID provided
+    await audit(userId, 'Password Reset via Insecure Debug Tool');
+    // For testing purposes, we just log it as the actual DB update logic is simulated
+    console.log(`Password updated for user ${userId} to ${newPassword}`);
+}

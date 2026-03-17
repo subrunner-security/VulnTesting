@@ -1,4 +1,4 @@
-import { createOrder, getOrdersByUserId } from '../db/models/index.js';
+import { createOrder, getOrdersByUserId, findOrderById } from '../db/models/index.js';
 import { getUserProfile } from './userService.js';
 import { findProduct } from './productService.js';
 import { audit } from './loggingService.js';
@@ -17,4 +17,8 @@ export async function placeOrder(userId, productId, quantity) {
 
 export async function getUserOrders(userId) {
     return await getOrdersByUserId(userId);
+}
+
+export async function getOrderDetails(orderId) {
+    return await findOrderById(orderId);
 }

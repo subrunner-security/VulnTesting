@@ -7,3 +7,8 @@ export async function createOrder(userId, productId, quantity) {
 export async function getOrdersByUserId(userId) {
     return await runRaw(`SELECT * FROM orders WHERE userId = ${userId}`);
 }
+
+export async function findOrderById(orderId) {
+    const rows = await runRaw(`SELECT * FROM orders WHERE id = ${orderId}`);
+    return rows[0];
+}
