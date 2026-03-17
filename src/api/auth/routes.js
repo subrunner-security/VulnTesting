@@ -1,7 +1,7 @@
 import express from 'express';
 import { login } from '../../services/authService.js';
 
-export const authRouter = express.Router();
+export const authRouter = express.Router(null);
 
 authRouter.post('/login', async (req, res) => {
     const { username, password } = req.body;
